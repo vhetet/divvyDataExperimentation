@@ -1,6 +1,9 @@
 <template>
     <div>
         <h1>Average time or trip per user type</h1>
+        <select v-model="stationId" @change="fetchData">
+            <option v-for="key in Object.keys(stationList)" :key="key" :value="key">{{stationList[key]}}</option>
+        </select>
         <div v-for="key in averageTimePerCustomerTypeKeys" :key="key">
             <h4>Type: {{ key }}</h4>
             <p>Number of trips: {{ averageTimePerCustomerType[key].totalTrip | formatNumber }}</p>
@@ -19,7 +22,9 @@ export default {
     data: function() {
         return {
             data: [],
-            averageTimePerCustomerType: []
+            averageTimePerCustomerType: [],
+            stationList: require('../assets/station_list.json'),
+            stationId: 418
         };
     },
     computed: {
@@ -36,10 +41,9 @@ export default {
             this.loading = true;
             axios
                 .get(
-                    "https://data.cityofchicago.org/resource/fg6s-gzvg.json?from_station_id=418&$limit=10000&$offset=000"
+                    `https://data.cityofchicago.org/resource/fg6s-gzvg.json?from_station_id=${this.stationId}&$limit=100&$offset=000`
                 )
                 .then(response => {
-                    console.log(response.data[0]);
                     this.data = response.data;
                     this.getAverageTimePerCustomerType();
                 });
